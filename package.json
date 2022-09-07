@@ -23,5 +23,8 @@
         "vite": "^3.0.8",
         "vite-plugin-electron": "^0.9.2",
         "vue": "^3.2.37"
+    },
+    "dependencies": {
+        "vc-state": "^1.0.0"
     }
 }
