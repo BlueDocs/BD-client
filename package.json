@@ -1,0 +1,27 @@
+{
+    "name": "bd-client",
+    "version": "0.0.0",
+    "main": "dist/electron/main/index.js",
+    "license": "MIT",
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "rimraf dist && vite build && electron-builder"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "devDependencies": {
+        "@fansy/eslint-config": "^1.0.0",
+        "@fansy/prettier-config": "^1.0.0",
+        "@vitejs/plugin-vue": "^3.0.1",
+        "@vitejs/plugin-vue-jsx": "^2.0.1",
+        "electron": "^20.0.2",
+        "electron-builder": "^23.3.3",
+        "rimraf": "^3.0.2",
+        "typescript": "^4.7.4",
+        "vite": "^3.0.8",
+        "vite-plugin-electron": "^0.9.2",
+        "vue": "^3.2.37"
+    }
+}
