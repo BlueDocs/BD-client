@@ -1,16 +1,18 @@
 import { defineComponent } from 'vue';
 import { RouterView } from 'vue-router';
-import { AppContextProvider } from './context';
+import { BlankLayout } from '../BlankLayout';
 
-export default defineComponent({
-    name: 'App',
+const DefaultLayout = defineComponent({
+    name: 'DefaultLayout',
     setup() {
         return () => {
             return (
-                <AppContextProvider>
+                <BlankLayout>
                     <RouterView />
-                </AppContextProvider>
+                </BlankLayout>
             );
         };
     },
 });
+
+export { DefaultLayout };
