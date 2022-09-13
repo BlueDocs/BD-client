@@ -4,6 +4,7 @@ import { Paragraph } from './Paragraph';
 import { Blockquote } from './Blockquote';
 import { Pre } from './Pre';
 import { Code } from './Code';
+import { Link } from './Link';
 
 export const DynamicRenderer = defineComponent({
     name: 'DynamicRenderer',
@@ -23,12 +24,13 @@ export const DynamicRenderer = defineComponent({
             h6: () => <Heading level={6} />,
             blockquote: () => <Blockquote />,
             pre: () => <Pre />,
-            a: () => <Code />,
+            a: () => <Link />,
+            code: () => <Code />,
             p: () => <Paragraph />,
         };
 
         const createComponent = ComponentMap[props.tag] || ComponentMap['p'];
 
-        return () => h(createComponent(), null, slots.default);
+        return () => h(createComponent(), slots.default);
     },
 });

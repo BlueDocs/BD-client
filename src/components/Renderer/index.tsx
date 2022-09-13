@@ -1,5 +1,7 @@
-import { computed, defineComponent, toRefs } from 'vue';
-import Markdown from 'markdown-it';
+import { defineComponent, PropType, toRefs } from 'vue';
+import { RendererContextProvider } from './context';
+import { DynamicRenderer } from './DynamicRenderer';
+import { MarkdownToken } from '@/interfaces';
 
 /**
  * Markdown 渲染结果组件
@@ -7,20 +9,40 @@ import Markdown from 'markdown-it';
 const Renderer = defineComponent({
     name: 'Renderer',
     props: {
-        markdown: {
-            type: String,
-            default: '',
+        tokens: {
+            type: Array as PropType<MarkdownToken[]>,
+            default: () => [],
         },
     },
     setup(props) {
-        const { markdown } = toRefs(props);
+        const { tokens } = toRefs(props);
 
-        const renderer = new Markdown();
-
-        const rendered = computed(() => renderer.render(markdown.value));
+        const namespace = 'renderer';
 
         return () => {
-            return <div innerHTML={rendered.value} />;
+            const elements = (function render(t: MarkdownToken[]) {
+                return t.map(item => {
+                    if (item.type === 'text') {
+                        return item.content;
+                    }
+
+                    if (item.tag === 'pre') {
+                        return <DynamicRenderer tag='pre'>{item.content}</DynamicRenderer>;
+                    }
+
+                    return (
+                        <DynamicRenderer tag={item.tag}>
+                            {item.children?.length && render(item.children)}
+                        </DynamicRenderer>
+                    );
+                });
+            })(tokens.value);
+
+            return (
+                <RendererContextProvider namespace={namespace}>
+                    <div class={namespace}>{elements}</div>
+                </RendererContextProvider>
+            );
         };
     },
 });
