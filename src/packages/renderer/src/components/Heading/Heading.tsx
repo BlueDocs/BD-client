@@ -1,9 +1,9 @@
 import { defineComponent, h, PropType } from 'vue';
-import { useRendererContext } from './context';
+import { useMarkdownRendererContext } from '../../context';
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-const Heading = defineComponent({
+export const Heading = defineComponent({
     name: 'HeadingRenderer',
     props: {
         level: {
@@ -12,7 +12,7 @@ const Heading = defineComponent({
         },
     },
     setup(props, { slots }) {
-        const { createNamespace } = useRendererContext();
+        const { createNamespace } = useMarkdownRendererContext();
 
         return () => {
             return h(
@@ -25,5 +25,3 @@ const Heading = defineComponent({
         };
     },
 });
-
-export { Heading };

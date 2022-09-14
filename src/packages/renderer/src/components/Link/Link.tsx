@@ -1,14 +1,12 @@
 import { defineComponent } from 'vue';
-import { useRendererContext } from './context';
+import { useMarkdownRendererContext } from '../../context';
 
-const Link = defineComponent({
+export const Link = defineComponent({
     name: 'LinkRenderer',
     setup(props, { slots }) {
-        const { createNamespace } = useRendererContext();
+        const { createNamespace } = useMarkdownRendererContext();
         return () => {
             return <a class={createNamespace('link')}>{slots.default?.()}</a>;
         };
     },
 });
-
-export { Link };

@@ -1,14 +1,14 @@
 import { defineComponent } from 'vue';
 import highlight from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
-import { useRendererContext } from './context';
+import { useMarkdownRendererContext } from '../../context';
 
 highlight.registerLanguage('javascript', javascript);
 
-const Pre = defineComponent({
+export const Pre = defineComponent({
     name: 'PreRenderer',
     setup(props, { slots }) {
-        const { createNamespace } = useRendererContext();
+        const { createNamespace } = useMarkdownRendererContext();
 
         return () => {
             return (
@@ -23,5 +23,3 @@ const Pre = defineComponent({
         };
     },
 });
-
-export { Pre };

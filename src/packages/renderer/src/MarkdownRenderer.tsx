@@ -1,13 +1,29 @@
-import { defineComponent, PropType, toRefs } from 'vue';
-import { RendererContextProvider } from './context';
-import { DynamicRenderer } from './DynamicRenderer';
+import { defineComponent, PropType, toRefs, h } from 'vue';
 import { MarkdownToken } from '@/interfaces';
+import { useMarkdownRendererContext } from './context';
+
+const DynamicRenderer = defineComponent({
+    name: 'DynamicRenderer',
+    props: {
+        tag: {
+            type: String,
+            required: true,
+        },
+    },
+    setup(props, { slots }) {
+        const { dynamicComponents } = useMarkdownRendererContext();
+
+        const createComponent = dynamicComponents[props.tag] || dynamicComponents['p'];
+
+        return () => h(createComponent(), slots.default);
+    },
+});
 
 /**
  * Markdown 渲染结果组件
  */
-const Renderer = defineComponent({
-    name: 'Renderer',
+export const MarkdownRenderer = defineComponent({
+    name: 'MarkdownRenderer',
     props: {
         tokens: {
             type: Array as PropType<MarkdownToken[]>,
@@ -17,7 +33,7 @@ const Renderer = defineComponent({
     setup(props) {
         const { tokens } = toRefs(props);
 
-        const namespace = 'renderer';
+        const { namespace } = useMarkdownRendererContext();
 
         return () => {
             const elements = (function render(t: MarkdownToken[]) {
@@ -38,13 +54,7 @@ const Renderer = defineComponent({
                 });
             })(tokens.value);
 
-            return (
-                <RendererContextProvider namespace={namespace}>
-                    <div class={namespace}>{elements}</div>
-                </RendererContextProvider>
-            );
+            return <div class={namespace}>{elements}</div>;
         };
     },
 });
-
-export { Renderer };

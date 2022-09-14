@@ -1,15 +1,13 @@
 import { defineComponent } from 'vue';
-import { useRendererContext } from './context';
+import { useMarkdownRendererContext } from '../../context';
 
-const Paragraph = defineComponent({
+export const Paragraph = defineComponent({
     name: 'ParagraphRenderer',
     setup(props, { slots }) {
-        const { createNamespace } = useRendererContext();
+        const { createNamespace } = useMarkdownRendererContext();
 
         return () => {
             return <p class={createNamespace('paragraph')}>{slots.default?.()}</p>;
         };
     },
 });
-
-export { Paragraph };
