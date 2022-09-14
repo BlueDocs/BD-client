@@ -10,13 +10,19 @@ const DynamicRenderer = defineComponent({
             type: String,
             required: true,
         },
+        attrs: {
+            type: Object as PropType<Record<string, string>>,
+            default: () => ({}),
+        },
     },
     setup(props, { slots }) {
+        const { attrs } = toRefs(props);
+
         const { dynamicComponents } = useMarkdownRendererContext();
 
         const createComponent = dynamicComponents[props.tag] || dynamicComponents['p'];
 
-        return () => h(createComponent(), slots.default);
+        return () => h(createComponent(attrs.value), slots.default);
     },
 });
 
@@ -41,12 +47,16 @@ export const MarkdownTokenRenderer = defineComponent({
                     }
 
                     if (isMarkdownCodeBlock(item)) {
-                        return <DynamicRenderer tag='pre'>{item.content}</DynamicRenderer>;
+                        return (
+                            <DynamicRenderer tag='pre' attrs={item.attrs}>
+                                {item.content}
+                            </DynamicRenderer>
+                        );
                     }
 
                     if (isMarkdownElement(item)) {
                         return (
-                            <DynamicRenderer tag={item.tag}>
+                            <DynamicRenderer tag={item.tag} attrs={item.attrs}>
                                 {item.children?.length && render(item.children)}
                             </DynamicRenderer>
                         );

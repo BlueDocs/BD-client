@@ -2,22 +2,24 @@ import Markdown from 'markdown-it';
 import type Token from 'markdown-it/lib/token';
 import { MarkdownElement, MarkdownText, MarkdownCodeBlock, MarkdownToken } from './interfaces';
 
-function _createElement(tag: string): MarkdownElement {
-    return { tag, type: 'element' };
+function _createElement(tag: string, attrs: Record<string, string> = {}): MarkdownElement {
+    return { tag, type: 'element', attrs };
 }
 
 function _createText(content: string): MarkdownText {
     return { type: 'text', content };
 }
 
-function _createCodeBlock(content: string): MarkdownCodeBlock {
-    return { type: 'code_block', content, tag: 'pre' };
+function _createCodeBlock(content: string, attrs: Record<string, string> = {}): MarkdownCodeBlock {
+    return { type: 'code_block', content, tag: 'pre', attrs };
 }
 
 export function parse(md: string): MarkdownToken[] {
     return (function _parse(originTokens: Token[], stack: MarkdownToken[] = []): MarkdownToken[] {
         return originTokens.reduce<MarkdownToken[]>((tokens, token) => {
-            const { type, tag, children, content, markup } = token;
+            const { type, tag, children, content, markup, attrs } = token;
+
+            const _attrs = attrs ? Object.fromEntries(attrs) : {};
 
             /**
              * 解析开始标签
@@ -28,7 +30,7 @@ export function parse(md: string): MarkdownToken[] {
              */
             if (/_open$/.test(type)) {
                 // 入栈 因为 group 解析还没结束
-                stack.push(_createElement(tag));
+                stack.push(_createElement(tag, _attrs));
                 return tokens;
             }
 
@@ -82,14 +84,14 @@ export function parse(md: string): MarkdownToken[] {
                     if (last.children) {
                         last.children = last.children.concat(_tokens);
                     } else {
-                        last.children = [_createElement(tag)];
+                        last.children = [_createElement(tag, _attrs)];
                     }
 
                     return tokens;
                 }
 
                 // 解析当前节点
-                return [...tokens, _createElement(tag)];
+                return [...tokens, _createElement(tag, _attrs)];
             }
 
             /**
@@ -116,7 +118,7 @@ export function parse(md: string): MarkdownToken[] {
              * 解析代码块类型的元素
              */
             if (type === 'fence' && markup === '```') {
-                return [...tokens, _createCodeBlock(content)];
+                return [...tokens, _createCodeBlock(content, _attrs)];
             }
 
             /**

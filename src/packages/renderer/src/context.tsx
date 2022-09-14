@@ -8,17 +8,17 @@ export interface MarkdownRendererContextProviderProps {
 }
 
 const defaultComponents: MarkdownRendererComponents = {
-    h1: () => <Heading level={1} />,
-    h2: () => <Heading level={2} />,
-    h3: () => <Heading level={3} />,
-    h4: () => <Heading level={4} />,
-    h5: () => <Heading level={5} />,
-    h6: () => <Heading level={6} />,
-    blockquote: () => <Blockquote />,
-    pre: () => <Pre />,
-    a: () => <Link />,
-    code: () => <Code />,
-    p: () => <Paragraph />,
+    h1: attrs => <Heading level={1} {...attrs} />,
+    h2: attrs => <Heading level={2} {...attrs} />,
+    h3: attrs => <Heading level={3} {...attrs} />,
+    h4: attrs => <Heading level={4} {...attrs} />,
+    h5: attrs => <Heading level={5} {...attrs} />,
+    h6: attrs => <Heading level={6} {...attrs} />,
+    blockquote: attrs => <Blockquote {...attrs} />,
+    pre: attrs => <Pre {...attrs} />,
+    a: attrs => <Link {...attrs} />,
+    code: attrs => <Code {...attrs} />,
+    p: attrs => <Paragraph {...attrs} />,
 };
 
 /**
