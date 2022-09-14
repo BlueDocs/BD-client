@@ -1,15 +1,13 @@
 import { defineComponent } from 'vue';
-import { useRendererContext } from './context';
+import { useMarkdownRendererContext } from '../../context';
 
-const Blockquote = defineComponent({
+export const Blockquote = defineComponent({
     name: 'BlockquoteRenderer',
     setup(props, { slots }) {
-        const { createNamespace } = useRendererContext();
+        const { createNamespace } = useMarkdownRendererContext();
 
         return () => {
             return <blockquote class={createNamespace('blockquote')}>{slots.default?.()}</blockquote>;
         };
     },
 });
-
-export { Blockquote };

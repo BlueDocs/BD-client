@@ -1,14 +1,12 @@
 import { defineComponent } from 'vue';
-import { useRendererContext } from './context';
+import { useMarkdownRendererContext } from '../../context';
 
-const Code = defineComponent({
+export const Code = defineComponent({
     name: 'CodeRenderer',
     setup(props, { slots }) {
-        const { createNamespace } = useRendererContext();
+        const { createNamespace } = useMarkdownRendererContext();
         return () => {
             return <code class={createNamespace('code')}>{slots.default?.()}</code>;
         };
     },
 });
-
-export { Code };
