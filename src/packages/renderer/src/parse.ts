@@ -2,20 +2,41 @@ import Markdown from 'markdown-it';
 import type Token from 'markdown-it/lib/token';
 import { MarkdownElement, MarkdownText, MarkdownCodeBlock, MarkdownToken } from './interfaces';
 
-function _createElement(tag: string, attrs: Record<string, string> = {}, children?: MarkdownToken[]): MarkdownElement {
-    return { tag, type: 'element', attrs, children };
-}
-
-function _createText(content: string): MarkdownText {
-    return { type: 'text', content };
-}
-
-function _createCodeBlock(content: string, attrs: Record<string, string> = {}): MarkdownCodeBlock {
-    return { type: 'code_block', content, tag: 'pre', attrs };
-}
-
+/**
+ * 解析 markdown 文本为 tokens
+ */
 export function parse(md: string): MarkdownToken[] {
-    return (function _parse(originTokens: Token[], stack: MarkdownToken[] = []): MarkdownToken[] {
+    const stack: MarkdownToken[] = [];
+
+    function _createElement(
+        tag: string,
+        attrs: Record<string, string> = {},
+        children?: MarkdownToken[]
+    ): MarkdownElement {
+        return { tag, type: 'element', attrs, children };
+    }
+
+    function _createText(content: string): MarkdownText {
+        return { type: 'text', content };
+    }
+
+    function _createCodeBlock(content: string, attrs: Record<string, string> = {}): MarkdownCodeBlock {
+        return { type: 'code_block', content, tag: 'pre', attrs };
+    }
+
+    function _appendChildInStackTop(...children: MarkdownToken[]) {
+        const parent = stack.at(-1);
+
+        if (parent) {
+            if (parent.children) {
+                parent.children.push(...children);
+            } else {
+                parent.children = children;
+            }
+        }
+    }
+
+    return (function _parse(originTokens: Token[]): MarkdownToken[] {
         return originTokens.reduce<MarkdownToken[]>((tokens, token) => {
             const { type, tag, children, content, markup, attrs, info } = token;
 
@@ -55,13 +76,7 @@ export function parse(md: string): MarkdownToken[] {
                 }
 
                 // 如果栈不是空的，证明最外层的 group 仍然没解析完成，还有别的子节点，推到上层的 group 中的 children 里
-                const last = stack.at(-1)!;
-
-                if (last.children) {
-                    last.children.push(_token);
-                } else {
-                    last.children = [_token];
-                }
+                _appendChildInStackTop(_token);
 
                 return tokens;
             }
@@ -76,16 +91,10 @@ export function parse(md: string): MarkdownToken[] {
             if (type === 'inline') {
                 // 如果有子元素，则进行深度解析
                 if (children?.length) {
-                    const _tokens = _parse(children, stack);
+                    const _tokens = _parse(children);
 
                     // 解析后的内容一定是最后入栈的元素，因为 inline 类型是紧跟 *_open 的元素
-                    const last = stack.at(-1)!;
-
-                    if (last.children) {
-                        last.children = last.children.concat(_tokens);
-                    } else {
-                        last.children = [_createElement(tag, _attrs)];
-                    }
+                    _appendChildInStackTop(..._tokens);
 
                     return tokens;
                 }
@@ -100,16 +109,10 @@ export function parse(md: string): MarkdownToken[] {
              * 如果是空文本元素，则不解析
              */
             if (type === 'text' && content) {
-                const _tokens = _createText(content);
+                const _token = _createText(content);
 
                 // 解析后的内容一定是最后入栈的元素，因为 text 类型是在 inline 的元素中的
-                const last = stack.at(-1)!;
-
-                if (last.children) {
-                    last.children = last.children.concat(_tokens);
-                } else {
-                    last.children = [_tokens];
-                }
+                _appendChildInStackTop(_token);
 
                 return tokens;
             }
@@ -118,16 +121,10 @@ export function parse(md: string): MarkdownToken[] {
              * 解析行内代码
              */
             if (type === 'code_inline') {
-                const _tokens = _createElement('code', {}, [_createText(content)]);
+                const _token = _createElement('code', {}, [_createText(content)]);
 
                 // 解析后的内容一定是最后入栈的元素，因为 code_inline 类型是在 inline 的元素中的
-                const last = stack.at(-1)!;
-
-                if (last.children) {
-                    last.children = last.children.concat(_tokens);
-                } else {
-                    last.children = [_tokens];
-                }
+                _appendChildInStackTop(_token);
 
                 return tokens;
             }
