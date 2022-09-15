@@ -47,11 +47,7 @@ export const MarkdownTokenRenderer = defineComponent({
                     }
 
                     if (isMarkdownCodeBlock(item)) {
-                        return (
-                            <DynamicRenderer tag='pre' attrs={item.attrs}>
-                                {item.content}
-                            </DynamicRenderer>
-                        );
+                        return <DynamicRenderer tag='pre' attrs={{ ...item.attrs, content: item.content }} />;
                     }
 
                     if (isMarkdownElement(item)) {
