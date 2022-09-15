@@ -17,7 +17,7 @@ function _createCodeBlock(content: string, attrs: Record<string, string> = {}): 
 export function parse(md: string): MarkdownToken[] {
     return (function _parse(originTokens: Token[], stack: MarkdownToken[] = []): MarkdownToken[] {
         return originTokens.reduce<MarkdownToken[]>((tokens, token) => {
-            const { type, tag, children, content, markup, attrs } = token;
+            const { type, tag, children, content, markup, attrs, info } = token;
 
             const _attrs = attrs ? Object.fromEntries(attrs) : {};
 
@@ -118,7 +118,7 @@ export function parse(md: string): MarkdownToken[] {
              * 解析代码块类型的元素
              */
             if (type === 'fence' && markup === '```') {
-                return [...tokens, _createCodeBlock(content, _attrs)];
+                return [...tokens, _createCodeBlock(content, { ..._attrs, language: info })];
             }
 
             /**
