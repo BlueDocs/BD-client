@@ -2,8 +2,8 @@ import Markdown from 'markdown-it';
 import type Token from 'markdown-it/lib/token';
 import { MarkdownElement, MarkdownText, MarkdownCodeBlock, MarkdownToken } from './interfaces';
 
-function _createElement(tag: string, attrs: Record<string, string> = {}): MarkdownElement {
-    return { tag, type: 'element', attrs };
+function _createElement(tag: string, attrs: Record<string, string> = {}, children?: MarkdownToken[]): MarkdownElement {
+    return { tag, type: 'element', attrs, children };
 }
 
 function _createText(content: string): MarkdownText {
@@ -103,6 +103,24 @@ export function parse(md: string): MarkdownToken[] {
                 const _tokens = _createText(content);
 
                 // 解析后的内容一定是最后入栈的元素，因为 text 类型是在 inline 的元素中的
+                const last = stack.at(-1)!;
+
+                if (last.children) {
+                    last.children = last.children.concat(_tokens);
+                } else {
+                    last.children = [_tokens];
+                }
+
+                return tokens;
+            }
+
+            /**
+             * 解析行内代码
+             */
+            if (type === 'code_inline') {
+                const _tokens = _createElement('code', {}, [_createText(content)]);
+
+                // 解析后的内容一定是最后入栈的元素，因为 code_inline 类型是在 inline 的元素中的
                 const last = stack.at(-1)!;
 
                 if (last.children) {
